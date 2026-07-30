@@ -276,7 +276,7 @@ enum {
 // text, mode, min value, max value, initial value, SetMonDataParam, digitCount
 static const struct EditPokemonStruct DebugPkmCreator_Options[] =
 {
-        [VAL_SPECIES]              = {Str_Species, EDIT_NORMAL, 1, NUM_SPECIES-1, SPECIES_BULBASAUR, MON_DATA_SPECIES, 4},
+        [VAL_SPECIES]              = {Str_Species, EDIT_NORMAL, SPECIES_BULBASAUR, SPECIES_CELEBI, SPECIES_BULBASAUR, MON_DATA_SPECIES, 3},
         [VAL_PID]                  = {Str_Personality, EDIT_HEX, 0, 0xffffffff, 0, MON_DATA_PERSONALITY, 8},
         [VAL_TID]                  = {Str_TrainerID, EDIT_NORMAL, 0, 0xffff, 0, MON_DATA_OT_ID, 5},
         [VAL_SID]                  = {Str_SecretID, EDIT_NORMAL, 0, 0xffff, 0, MON_DATA_OT_ID, 5}, // SID
