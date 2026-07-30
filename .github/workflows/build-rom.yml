@@ -3,7 +3,7 @@ name: Build Heart & Soul ROM
 on:
   workflow_dispatch:
   push:
-    branches: [ main, master ]
+    branches: [ main, master, feature/new-cheats ]
     paths-ignore:
       - '**/*.md'
 
