@@ -1,0 +1,60 @@
+name: Build Heart & Soul ROM
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main, master ]
+    paths-ignore:
+      - '**/*.md'
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: devkitpro/devkitarm:20230928
+    timeout-minutes: 45
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Install host build dependencies
+        shell: bash
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends \
+            build-essential git libpng-dev pkg-config python3 ca-certificates
+
+      - name: Show toolchain versions
+        shell: bash
+        run: |
+          echo "DEVKITPRO=${DEVKITPRO:-unset}"
+          echo "DEVKITARM=${DEVKITARM:-unset}"
+          arm-none-eabi-gcc --version
+          make --version | head -1
+
+      - name: Build ROM with modern GCC
+        shell: bash
+        run: |
+          make clean || true
+          make modern -j2
+
+      - name: Verify build output
+        shell: bash
+        run: |
+          test -f pokemonHnS.gba
+          ls -lh pokemonHnS.gba
+          sha1sum pokemonHnS.gba | tee pokemonHnS.gba.sha1
+
+      - name: Upload Delta-ready ROM
+        uses: actions/upload-artifact@v4
+        with:
+          name: Pokemon-Heart-and-Soul-Encounter-Menu
+          path: |
+            pokemonHnS.gba
+            pokemonHnS.gba.sha1
+          if-no-files-found: error
+          retention-days: 14
