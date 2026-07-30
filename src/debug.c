@@ -399,43 +399,7 @@ static void DebugAction_PkmCreator_Enemy_Party_Add(u8 taskid);
 static void DebugAction_PkmCreator_Testing(u8 taskid);
 static void DebugAction_PkmCreator_Testing_Copy(u8 taskid); 
 
-static void DebugAction_Fill_PCBoxes_Fast(u8 taskId) //Credit: Sierraffinity
-{
-    int boxId, boxPosition;
-    u32 personality;
-    u32 species = SPECIES_BULBASAUR;
-    struct BoxPokemon boxMon;
-
-    personality = Random32();
-
-    for (boxId = 0; boxId < TOTAL_BOXES_COUNT; boxId++)
-    {
-        for (boxPosition = 0; boxPosition < IN_BOX_COUNT; boxPosition++)
-        {
-            if (!GetBoxMonData(&gPokemonStoragePtr->boxes[boxId][boxPosition], MON_DATA_SANITY_HAS_SPECIES))
-            {
-                CreateBoxMon(&boxMon,
-                             species,
-                             100,
-                             32,
-                             personality,
-                             0,
-                             OT_ID_PLAYER_ID,
-                             0);
-
-                gPokemonStoragePtr->boxes[boxId][boxPosition] = boxMon;
-
-                if (species < SPECIES_CELEBI)
-                    species++;
-                else
-                    species = SPECIES_BULBASAUR;
-            }
-        }
-    }
-
-    Debug_DestroyMenu_Full(taskId);
-    ScriptContext_Enable();
-}
+static void DebugAction_Fill_PCBoxes_Fast(u8 taskId);
 static void DebugAction_Fill_PCBoxes_Slow(u8 taskId);
 static void DebugAction_Fill_PCItemStorage(u8 taskId);
 static void DebugAction_Fill_PocketItems(u8 taskId);
@@ -3934,18 +3898,8 @@ static void DebugAction_Fill_PCBoxes_Fast(u8 taskId) //Credit: Sierraffinity
 {
     int boxId, boxPosition;
     u32 personality;
+    u32 species = SPECIES_BULBASAUR;
     struct BoxPokemon boxMon;
-
-    personality = Random32();
-
-    CreateBoxMon(&boxMon,
-                 SPECIES_BULBASAUR,
-                 100,
-                 32,
-                 personality,
-                 0,
-                 OT_ID_PLAYER_ID,
-                 0);
 
     for (boxId = 0; boxId < TOTAL_BOXES_COUNT; boxId++)
     {
@@ -3953,7 +3907,22 @@ static void DebugAction_Fill_PCBoxes_Fast(u8 taskId) //Credit: Sierraffinity
         {
             if (!GetBoxMonData(&gPokemonStoragePtr->boxes[boxId][boxPosition], MON_DATA_SANITY_HAS_SPECIES))
             {
+                personality = Random32();
+                CreateBoxMon(&boxMon,
+                             species,
+                             100,
+                             32,
+                             personality,
+                             0,
+                             OT_ID_PLAYER_ID,
+                             0);
+
                 gPokemonStoragePtr->boxes[boxId][boxPosition] = boxMon;
+
+                if (species < SPECIES_CELEBI)
+                    species++;
+                else
+                    species = SPECIES_BULBASAUR;
             }
         }
     }
