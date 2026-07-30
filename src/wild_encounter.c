@@ -1,4 +1,5 @@
 #include "global.h"
+#include "cheats.h"
 #include "wild_encounter.h"
 #include "pokemon.h"
 #include "metatile_behavior.h"
@@ -444,6 +445,11 @@ static void CreateWildMon(u16 species, u8 level)
         #endif
         species = GetSpeciesRandomSeeded(species, TX_RANDOM_T_WILD_POKEMON, 0);
     }
+
+    // The encounter override is applied after the built-in randomizer so the
+    // explicitly selected species always takes precedence.
+    if (IsEncounterOverrideEnabled())
+        species = GetEncounterOverrideSpecies();
 
     switch (gSpeciesInfo[species].genderRatio)
     {
