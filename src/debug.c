@@ -78,6 +78,8 @@ enum { // Main
     DEBUG_MENU_ITEM_FILL,
     DEBUG_MENU_ITEM_SOUND,
     DEBUG_MENU_ITEM_ACCESS_PC,
+    DEBUG_MENU_ITEM_WALK_THROUGH_WALLS,
+    DEBUG_MENU_ITEM_INFINITE_REPEL,
     DEBUG_MENU_ITEM_CANCEL
 };
 enum { // Util
@@ -208,7 +210,7 @@ enum { //Sound
 
 // *******************************
 // Constants
-#define DEBUG_MENU_WIDTH_MAIN 16
+#define DEBUG_MENU_WIDTH_MAIN 20
 #define DEBUG_MENU_HEIGHT_MAIN 9
 
 #define DEBUG_MENU_WIDTH_EXTRA 10
@@ -303,6 +305,10 @@ static void DebugAction_Util_Script_8(u8 taskId);
 static void DebugAction_OpenEncounterMenu(u8 taskId);
 static void DebugTask_HandleEncounterMenu(u8 taskId);
 static void Debug_DrawEncounterMenu(u8 taskId);
+static void DebugAction_OpenWalkThroughWallsMenu(u8 taskId);
+static void DebugAction_OpenInfiniteRepelMenu(u8 taskId);
+static void DebugTask_HandleToggleMenu(u8 taskId);
+static void Debug_DrawToggleMenu(u8 taskId);
 static void DebugAction_OpenUtilitiesMenu(u8 taskId);
 static void DebugAction_OpenScriptsMenu(u8 taskId);
 static void DebugAction_OpenFlagsVarsMenu(u8 taskId);
@@ -447,6 +453,9 @@ static const u8 sDebugText_Continue[] =      _("Continue…{CLEAR_TO 110}{RIGHT_
 // Main Menu
 static const u8 sDebugText_Encounter[] =        _("Encounter Modifier…{CLEAR_TO 110}{RIGHT_ARROW}");
 static const u8 sDebugText_EncounterScreen[] =  _("ENCOUNTER {STR_VAR_1}\n{STR_VAR_2}\nNo. {STR_VAR_3}\n\nUP/DOWN: Choose\nL/R: Jump 10\nA: Toggle  B: Back");
+static const u8 sDebugText_WalkThroughWalls[] = _("Walk Through Walls");
+static const u8 sDebugText_InfiniteRepel[] = _("Infinite Repel");
+static const u8 sDebugText_ToggleScreen[] = _("{STR_VAR_1}\n\nStatus: {STR_VAR_2}\n\nA: Toggle  B: Back");
 static const u8 sDebugText_Utilities[] =        _("Utilities…{CLEAR_TO 110}{RIGHT_ARROW}");
 static const u8 sDebugText_Scripts[] =          _("Scripts…{CLEAR_TO 110}{RIGHT_ARROW}");
 static const u8 sDebugText_FlagsVars[] =        _("Flags & Vars…{CLEAR_TO 110}{RIGHT_ARROW}");
@@ -646,33 +655,21 @@ static const s32 sPowersOfTen[] =
 // List Menu Items
 static const struct ListMenuItem sDebugMenu_Items_Main[] =
 {
-    [DEBUG_MENU_ITEM_ENCOUNTER]       = {sDebugText_Encounter,  DEBUG_MENU_ITEM_ENCOUNTER},
-    [DEBUG_MENU_ITEM_UTILITIES]       = {sDebugText_Utilities,  DEBUG_MENU_ITEM_UTILITIES},
-    [DEBUG_MENU_ITEM_SCRIPTS]         = {sDebugText_Scripts,    DEBUG_MENU_ITEM_SCRIPTS},
-    [DEBUG_MENU_ITEM_FLAGVAR]         = {sDebugText_FlagsVars,  DEBUG_MENU_ITEM_FLAGVAR},
-    [DEBUG_MENU_ITEM_BATTLE]          = {sDebugText_Battle,     DEBUG_MENU_ITEM_BATTLE},
-    [DEBUG_MENU_ITEM_GIVE]            = {sDebugText_Give,       DEBUG_MENU_ITEM_GIVE},
-    [DEBUG_MENU_ITEM_POKEMON_CREATOR] = {sDebugText_PkmCreator, DEBUG_MENU_ITEM_POKEMON_CREATOR},
-    [DEBUG_MENU_ITEM_FILL]            = {sDebugText_Fill,       DEBUG_MENU_ITEM_FILL},
-    [DEBUG_MENU_ITEM_SOUND]           = {sDebugText_Sound,      DEBUG_MENU_ITEM_SOUND},
-    [DEBUG_MENU_ITEM_ACCESS_PC]       = {sDebugText_AccessPC,   DEBUG_MENU_ITEM_ACCESS_PC},
-    [DEBUG_MENU_ITEM_CANCEL]          = {sDebugText_Cancel,     DEBUG_MENU_ITEM_CANCEL}
+    {sDebugText_Encounter,         DEBUG_MENU_ITEM_ENCOUNTER},
+    {sDebugText_WalkThroughWalls,  DEBUG_MENU_ITEM_WALK_THROUGH_WALLS},
+    {sDebugText_InfiniteRepel,     DEBUG_MENU_ITEM_INFINITE_REPEL},
+    {sDebugText_Utilities,         DEBUG_MENU_ITEM_UTILITIES},
+    {sDebugText_Give,              DEBUG_MENU_ITEM_GIVE},
+    {sDebugText_PkmCreator,        DEBUG_MENU_ITEM_POKEMON_CREATOR},
+    {sDebugText_Fill,              DEBUG_MENU_ITEM_FILL},
+    {sDebugText_Cancel,            DEBUG_MENU_ITEM_CANCEL}
 };
 static const struct ListMenuItem sDebugMenu_Items_Utilities[] =
 {
-    [DEBUG_UTIL_MENU_ITEM_HEAL_PARTY]       = {sDebugText_Util_HealParty,        DEBUG_UTIL_MENU_ITEM_HEAL_PARTY},
-    [DEBUG_UTIL_MENU_ITEM_FLY]              = {sDebugText_Util_Fly,              DEBUG_UTIL_MENU_ITEM_FLY},
-    [DEBUG_UTIL_MENU_ITEM_WARP]             = {sDebugText_Util_WarpToMap,        DEBUG_UTIL_MENU_ITEM_WARP},
-    [DEBUG_UTIL_MENU_ITEM_POISON_MONS]      = {sDebugText_Util_PoisonMons,       DEBUG_UTIL_MENU_ITEM_POISON_MONS},
-    [DEBUG_UTIL_MENU_ITEM_SAVEBLOCK]        = {sDebugText_Util_SaveBlockSpace,   DEBUG_UTIL_MENU_ITEM_SAVEBLOCK},
-    [DEBUG_UTIL_MENU_ITEM_WEATHER]          = {sDebugText_Util_Weather,          DEBUG_UTIL_MENU_ITEM_WEATHER},
-    [DEBUG_UTIL_MENU_ITEM_CHECKWALLCLOCK]   = {sDebugText_Util_CheckWallClock,   DEBUG_UTIL_MENU_ITEM_CHECKWALLCLOCK},
-    [DEBUG_UTIL_MENU_ITEM_SETWALLCLOCK]     = {sDebugText_Util_SetWallClock,     DEBUG_UTIL_MENU_ITEM_SETWALLCLOCK},
-    [DEBUG_UTIL_MENU_ITEM_WATCHCREDITS]     = {sDebugText_Util_WatchCredits,     DEBUG_UTIL_MENU_ITEM_WATCHCREDITS},
-    [DEBUG_UTIL_MENU_ITEM_TRAINER_NAME]     = {sDebugText_Util_Trainer_Name,     DEBUG_UTIL_MENU_ITEM_TRAINER_NAME},
-    [DEBUG_UTIL_MENU_ITEM_TRAINER_GENDER]   = {sDebugText_Util_Trainer_Gender,   DEBUG_UTIL_MENU_ITEM_TRAINER_GENDER},
-    [DEBUG_UTIL_MENU_ITEM_TRAINER_ID]       = {sDebugText_Util_Trainer_Id,       DEBUG_UTIL_MENU_ITEM_TRAINER_ID},
-    [DEBUG_UTIL_MENU_ITEM_CHEAT]            = {sDebugText_Util_CheatStart,        DEBUG_UTIL_MENU_ITEM_CHEAT},
+    {sDebugText_Util_HealParty,      DEBUG_UTIL_MENU_ITEM_HEAL_PARTY},
+    {sDebugText_Util_Fly,            DEBUG_UTIL_MENU_ITEM_FLY},
+    {sDebugText_Util_Weather,        DEBUG_UTIL_MENU_ITEM_WEATHER},
+    {sDebugText_Util_SetWallClock,   DEBUG_UTIL_MENU_ITEM_SETWALLCLOCK},
 };
 static const struct ListMenuItem sDebugMenu_Items_Scripts[] =
 {
@@ -807,6 +804,8 @@ static void (*const sDebugMenu_Actions_Main[])(u8) =
     [DEBUG_MENU_ITEM_FILL]            = DebugAction_OpenFillMenu,
     [DEBUG_MENU_ITEM_SOUND]           = DebugAction_OpenSoundMenu,
     [DEBUG_MENU_ITEM_ACCESS_PC]       = DebugAction_AccessPC,
+    [DEBUG_MENU_ITEM_WALK_THROUGH_WALLS] = DebugAction_OpenWalkThroughWallsMenu,
+    [DEBUG_MENU_ITEM_INFINITE_REPEL]  = DebugAction_OpenInfiniteRepelMenu,
     [DEBUG_MENU_ITEM_CANCEL]          = DebugAction_Cancel
 };
 static void (*const sDebugMenu_Actions_Utilities[])(u8) =
@@ -1779,6 +1778,79 @@ static void DebugTask_HandleEncounterMenu(u8 taskId)
         PlaySE(SE_SELECT);
         SetEncounterOverrideEnabled(!IsEncounterOverrideEnabled());
         Debug_DrawEncounterMenu(taskId);
+    }
+    else if (gMain.newKeys & B_BUTTON)
+    {
+        PlaySE(SE_SELECT);
+        ClearStdWindowAndFrame(gTasks[taskId].data[2], TRUE);
+        RemoveWindow(gTasks[taskId].data[2]);
+        DestroyTask(taskId);
+        Debug_ReShowMainMenu();
+    }
+}
+
+static void Debug_DrawToggleMenu(u8 taskId)
+{
+    bool8 enabled;
+
+    if (gTasks[taskId].data[3] == 0)
+    {
+        StringCopy(gStringVar1, sDebugText_WalkThroughWalls);
+        enabled = FlagGet(FLAG_SYS_NO_COLLISION);
+    }
+    else
+    {
+        StringCopy(gStringVar1, sDebugText_InfiniteRepel);
+        enabled = FlagGet(FLAG_SYS_NO_ENCOUNTER);
+    }
+
+    StringCopy(gStringVar2, enabled ? sDebugText_True : sDebugText_False);
+    StringExpandPlaceholders(gStringVar4, sDebugText_ToggleScreen);
+    FillWindowPixelBuffer(gTasks[taskId].data[2], PIXEL_FILL(1));
+    AddTextPrinterParameterized(gTasks[taskId].data[2], 1, gStringVar4, 1, 1, 0, NULL);
+    CopyWindowToVram(gTasks[taskId].data[2], COPYWIN_FULL);
+}
+
+static void DebugAction_OpenToggleMenu(u8 taskId, u8 toggleId)
+{
+    u8 windowId;
+
+    DestroyListMenuTask(gTasks[taskId].data[0], NULL, NULL);
+    ClearStdWindowAndFrame(gTasks[taskId].data[1], TRUE);
+    RemoveWindow(gTasks[taskId].data[1]);
+
+    HideMapNamePopUpWindow();
+    LoadMessageBoxAndBorderGfx();
+    windowId = AddWindow(&sDebugMenuWindowTemplateMain);
+    DrawStdWindowFrame(windowId, FALSE);
+
+    gTasks[taskId].data[2] = windowId;
+    gTasks[taskId].data[3] = toggleId;
+    gTasks[taskId].func = DebugTask_HandleToggleMenu;
+    Debug_DrawToggleMenu(taskId);
+}
+
+static void DebugAction_OpenWalkThroughWallsMenu(u8 taskId)
+{
+    DebugAction_OpenToggleMenu(taskId, 0);
+}
+
+static void DebugAction_OpenInfiniteRepelMenu(u8 taskId)
+{
+    DebugAction_OpenToggleMenu(taskId, 1);
+}
+
+static void DebugTask_HandleToggleMenu(u8 taskId)
+{
+    if (gMain.newKeys & A_BUTTON)
+    {
+        if (gTasks[taskId].data[3] == 0)
+            FlagToggle(FLAG_SYS_NO_COLLISION);
+        else
+            FlagToggle(FLAG_SYS_NO_ENCOUNTER);
+
+        PlaySE(SE_SELECT);
+        Debug_DrawToggleMenu(taskId);
     }
     else if (gMain.newKeys & B_BUTTON)
     {
