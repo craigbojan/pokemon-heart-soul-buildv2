@@ -38,7 +38,7 @@ jobs:
           echo "DEVKITPRO=${DEVKITPRO:-unset}"
           echo "DEVKITARM=${DEVKITARM:-unset}"
           arm-none-eabi-gcc --version
-          make --version | head -1
+          make --version
 
       - name: Build ROM with modern GCC
         shell: bash
