@@ -10,6 +10,7 @@
 #include "battle.h"
 #include "battle_setup.h"
 #include "coins.h"
+#include "cheats.h"
 #include "credits.h"
 #include "data.h"
 #include "daycare.h"
@@ -67,6 +68,7 @@
 // *******************************
 // Enums
 enum { // Main
+    DEBUG_MENU_ITEM_ENCOUNTER,
     DEBUG_MENU_ITEM_UTILITIES,
     DEBUG_MENU_ITEM_SCRIPTS,
     DEBUG_MENU_ITEM_FLAGVAR,
@@ -298,6 +300,9 @@ static void DebugAction_Util_Script_6(u8 taskId);
 static void DebugAction_Util_Script_7(u8 taskId);
 static void DebugAction_Util_Script_8(u8 taskId);
 
+static void DebugAction_OpenEncounterMenu(u8 taskId);
+static void DebugTask_HandleEncounterMenu(u8 taskId);
+static void Debug_DrawEncounterMenu(u8 taskId);
 static void DebugAction_OpenUtilitiesMenu(u8 taskId);
 static void DebugAction_OpenScriptsMenu(u8 taskId);
 static void DebugAction_OpenFlagsVarsMenu(u8 taskId);
@@ -440,6 +445,8 @@ static const u8 sDebugText_Dashes[] =        _("---");
 static const u8 sDebugText_Empty[] =         _("");
 static const u8 sDebugText_Continue[] =      _("Continue…{CLEAR_TO 110}{RIGHT_ARROW}");
 // Main Menu
+static const u8 sDebugText_Encounter[] =        _("Encounter Modifier…{CLEAR_TO 110}{RIGHT_ARROW}");
+static const u8 sDebugText_EncounterScreen[] =  _("ENCOUNTER {STR_VAR_1}\n{STR_VAR_2}\nNo. {STR_VAR_3}\n\nUP/DOWN: Choose\nL/R: Jump 10\nA: Toggle  B: Back");
 static const u8 sDebugText_Utilities[] =        _("Utilities…{CLEAR_TO 110}{RIGHT_ARROW}");
 static const u8 sDebugText_Scripts[] =          _("Scripts…{CLEAR_TO 110}{RIGHT_ARROW}");
 static const u8 sDebugText_FlagsVars[] =        _("Flags & Vars…{CLEAR_TO 110}{RIGHT_ARROW}");
@@ -639,6 +646,7 @@ static const s32 sPowersOfTen[] =
 // List Menu Items
 static const struct ListMenuItem sDebugMenu_Items_Main[] =
 {
+    [DEBUG_MENU_ITEM_ENCOUNTER]       = {sDebugText_Encounter,  DEBUG_MENU_ITEM_ENCOUNTER},
     [DEBUG_MENU_ITEM_UTILITIES]       = {sDebugText_Utilities,  DEBUG_MENU_ITEM_UTILITIES},
     [DEBUG_MENU_ITEM_SCRIPTS]         = {sDebugText_Scripts,    DEBUG_MENU_ITEM_SCRIPTS},
     [DEBUG_MENU_ITEM_FLAGVAR]         = {sDebugText_FlagsVars,  DEBUG_MENU_ITEM_FLAGVAR},
@@ -789,6 +797,7 @@ static const struct ListMenuItem sDebugMenu_Items_Sound[] =
 // Menu Actions
 static void (*const sDebugMenu_Actions_Main[])(u8) =
 {
+    [DEBUG_MENU_ITEM_ENCOUNTER]       = DebugAction_OpenEncounterMenu,
     [DEBUG_MENU_ITEM_UTILITIES]       = DebugAction_OpenUtilitiesMenu,
     [DEBUG_MENU_ITEM_SCRIPTS]         = DebugAction_OpenScriptsMenu,
     [DEBUG_MENU_ITEM_FLAGVAR]         = DebugAction_OpenFlagsVarsMenu,
@@ -1705,6 +1714,80 @@ static void DebugAction_OpenSoundMenu(u8 taskId)
 {
     Debug_DestroyMenu(taskId);
     Debug_ShowMenu(DebugTask_HandleMenuInput_Sound, sDebugMenu_ListTemplate_Sound);
+}
+
+static void Debug_DrawEncounterMenu(u8 taskId)
+{
+    u16 species = gTasks[taskId].data[3];
+
+    FillWindowPixelBuffer(gTasks[taskId].data[2], PIXEL_FILL(1));
+    StringCopy(gStringVar1, IsEncounterOverrideEnabled() ? sDebugText_True : sDebugText_False);
+    StringCopy(gStringVar2, gSpeciesNames[species]);
+    ConvertIntToDecimalStringN(gStringVar3, species, STR_CONV_MODE_LEADING_ZEROS, 3);
+    StringExpandPlaceholders(gStringVar4, sDebugText_EncounterScreen);
+    AddTextPrinterParameterized(gTasks[taskId].data[2], 1, gStringVar4, 1, 1, 0, NULL);
+    CopyWindowToVram(gTasks[taskId].data[2], COPYWIN_FULL);
+}
+
+static void DebugAction_OpenEncounterMenu(u8 taskId)
+{
+    u8 windowId;
+
+    DestroyListMenuTask(gTasks[taskId].data[0], NULL, NULL);
+    ClearStdWindowAndFrame(gTasks[taskId].data[1], TRUE);
+    RemoveWindow(gTasks[taskId].data[1]);
+
+    HideMapNamePopUpWindow();
+    LoadMessageBoxAndBorderGfx();
+    windowId = AddWindow(&sDebugMenuWindowTemplateMain);
+    DrawStdWindowFrame(windowId, FALSE);
+
+    gTasks[taskId].data[2] = windowId;
+    gTasks[taskId].data[3] = GetEncounterOverrideSpecies();
+    gTasks[taskId].func = DebugTask_HandleEncounterMenu;
+    Debug_DrawEncounterMenu(taskId);
+}
+
+static void DebugTask_HandleEncounterMenu(u8 taskId)
+{
+    s16 species = gTasks[taskId].data[3];
+
+    if (gMain.newKeys & DPAD_UP)
+        species++;
+    else if (gMain.newKeys & DPAD_DOWN)
+        species--;
+    else if (gMain.newKeys & DPAD_RIGHT)
+        species += 10;
+    else if (gMain.newKeys & DPAD_LEFT)
+        species -= 10;
+
+    if (species > SPECIES_CELEBI)
+        species = SPECIES_BULBASAUR;
+    else if (species < SPECIES_BULBASAUR)
+        species = SPECIES_CELEBI;
+
+    if (species != gTasks[taskId].data[3])
+    {
+        PlaySE(SE_SELECT);
+        gTasks[taskId].data[3] = species;
+        SetEncounterOverrideSpecies(species);
+        Debug_DrawEncounterMenu(taskId);
+    }
+
+    if (gMain.newKeys & A_BUTTON)
+    {
+        PlaySE(SE_SELECT);
+        SetEncounterOverrideEnabled(!IsEncounterOverrideEnabled());
+        Debug_DrawEncounterMenu(taskId);
+    }
+    else if (gMain.newKeys & B_BUTTON)
+    {
+        PlaySE(SE_SELECT);
+        ClearStdWindowAndFrame(gTasks[taskId].data[2], TRUE);
+        RemoveWindow(gTasks[taskId].data[2]);
+        DestroyTask(taskId);
+        Debug_ReShowMainMenu();
+    }
 }
 
 // *******************************
