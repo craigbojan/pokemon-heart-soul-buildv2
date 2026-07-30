@@ -14040,12 +14040,12 @@ static const struct TrainerMonNoItemDefaultMoves sParty_Grunt2[] = { //TeamRocke
     {
     .iv = 0,
     .lvl = 33,
-    .species = SPECIES_RATICATE,
+    .species = SPECIES_PERSIAN,
     },
     {
     .iv = 0,
     .lvl = 33,
-    .species = SPECIES_RATICATE,
+    .species = SPECIES_MURKROW,
     },
 };
 
@@ -14078,7 +14078,7 @@ static const struct TrainerMonNoItemDefaultMoves sParty_Grunt4[] = { //TeamRocke
     {
     .iv = 0,
     .lvl = 34,
-    .species = SPECIES_AIPOM,
+    .species = SPECIES_SNEASEL,
     },
 };
 
@@ -14188,7 +14188,7 @@ static const struct TrainerMonNoItemDefaultMoves sParty_Grunt11[] = { //TeamRock
     {
     .iv = 0,
     .lvl = 37,
-    .species = SPECIES_WEEZING,
+    .species = SPECIES_HOUNDOUR,
     },
 };
 
@@ -14254,7 +14254,7 @@ static const struct TrainerMonNoItemDefaultMoves sParty_Grunt14[] = { //TeamRock
     {
     .iv = 0,
     .lvl = 29,
-    .species = SPECIES_GOLBAT,
+    .species = SPECIES_MURKROW,
     },
 };
 
@@ -14327,7 +14327,7 @@ static const struct TrainerMonNoItemDefaultMoves sParty_Grunt19[] = { //TeamRock
     {
     .iv = 0,
     .lvl = 37,
-    .species = SPECIES_WEEZING,
+    .species = SPECIES_FORRETRESS,
     },
 };
 
@@ -14355,7 +14355,7 @@ static const struct TrainerMonNoItemDefaultMoves sParty_Grunt21[] = { //TeamRock
     {
     .iv = 0,
     .lvl = 11,
-    .species = SPECIES_RATTATA,
+    .species = SPECIES_EKANS,
     },
 };
 
@@ -14408,7 +14408,7 @@ static const struct TrainerMonNoItemDefaultMoves sParty_Grunt23[] = { //TeamRock
     {
     .iv = 0,
     .lvl = 25,
-    .species = SPECIES_GOLBAT,
+    .species = SPECIES_SNEASEL,
     },
     {
     .iv = 0,
@@ -19145,7 +19145,7 @@ static const struct TrainerMonNoItemDefaultMoves sParty_Grunt30[] = { //TeamRock
     {
     .iv = 0,
     .lvl = 36,
-    .species = SPECIES_GOLBAT,
+    .species = SPECIES_MURKROW,
     },
 };
 
@@ -19154,7 +19154,7 @@ static const struct TrainerMonNoItemDefaultMoves sParty_Grunt31[] = { //TeamRock
     {
     .iv = 0,
     .lvl = 30,
-    .species = SPECIES_KOFFING,
+    .species = SPECIES_DROWZEE,
     },
 };
 static const struct TrainerMonNoItemDefaultMoves sParty_Grunt32[] = { //TeamRocketGroup
@@ -19168,7 +19168,7 @@ static const struct TrainerMonNoItemDefaultMoves sParty_Grunt33[] = { //TeamRock
     {
     .iv = 0,
     .lvl = 20,
-    .species = SPECIES_KOFFING,
+    .species = SPECIES_EKANS,
     },
 };
 // --- Gym Leader Trainers Start ---
