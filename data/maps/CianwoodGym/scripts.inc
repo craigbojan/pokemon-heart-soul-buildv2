@@ -31,9 +31,14 @@ CianwoodGym_Text_GymStatueCertified:
 CianwoodGym_EventScript_Chuck::
 	lock
 	faceplayer
+	// Do not send Chuck to the Dojo until the player has actually beaten him.
+	// This also repairs saves where Fly to Map set the Vermilion visit flag early.
+	goto_if_unset FLAG_DEFEATED_CIANWOOD_GYM, CianwoodGym_EventScript_Chuck_FirstBattle
 	goto_if_unset FLAG_HIDE_DOJO_CHUCK, CianwoodGym_EventScript_ChuckAtDojo
 	goto_if_set FLAG_VISITED_VERMILION_CITY, CianwoodGym_EventScript_ChuckGotoDojo
-	goto_if_set FLAG_DEFEATED_CIANWOOD_GYM, CianwoodGym_EventScript_Chuck_Defeated
+	goto CianwoodGym_EventScript_Chuck_Defeated
+
+CianwoodGym_EventScript_Chuck_FirstBattle::
 	msgbox CianwoodGym_Text_ChuckIntro1, MSGBOX_DEFAULT
 	applymovement LOCALID_CIANWOOD_CHUCK, CianwoodGym_Movement_ChuckLeft
 	waitmovement 0

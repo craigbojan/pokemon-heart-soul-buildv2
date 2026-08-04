@@ -175,8 +175,8 @@
 #define VAR_ROUTE27_BAOBA_CALL                              0x409B 
 #define VAR_CHEAT_ENCOUNTER_ENABLED                      0x409C
 #define VAR_CHEAT_ENCOUNTER_SPECIES                      0x409D
-#define VAR_UNUSED_HNS_VAR6                              0x409E
-#define VAR_UNUSED_HNS_VAR7                              0x409F// HnS Vars end
+#define VAR_CHEAT_INFINITE_PP                            0x409E
+#define VAR_CHEAT_ALWAYS_CATCH                           0x409F // HnS Vars end
 #define VAR_SLATEPORT_HARBOR_STATE                       0x40A0
 #define VAR_UNUSED_0x40A1                                0x40A1 
 #define VAR_SEAFLOOR_CAVERN_STATE                        0x40A2

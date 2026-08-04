@@ -80,6 +80,8 @@ enum { // Main
     DEBUG_MENU_ITEM_ACCESS_PC,
     DEBUG_MENU_ITEM_WALK_THROUGH_WALLS,
     DEBUG_MENU_ITEM_INFINITE_REPEL,
+    DEBUG_MENU_ITEM_INFINITE_PP,
+    DEBUG_MENU_ITEM_ALWAYS_CATCH,
     DEBUG_MENU_ITEM_CANCEL
 };
 enum { // Util
@@ -307,6 +309,8 @@ static void DebugTask_HandleEncounterMenu(u8 taskId);
 static void Debug_DrawEncounterMenu(u8 taskId);
 static void DebugAction_OpenWalkThroughWallsMenu(u8 taskId);
 static void DebugAction_OpenInfiniteRepelMenu(u8 taskId);
+static void DebugAction_OpenInfinitePPMenu(u8 taskId);
+static void DebugAction_OpenAlwaysCatchMenu(u8 taskId);
 static void DebugTask_HandleToggleMenu(u8 taskId);
 static void Debug_DrawToggleMenu(u8 taskId);
 static void DebugAction_OpenUtilitiesMenu(u8 taskId);
@@ -455,6 +459,8 @@ static const u8 sDebugText_Encounter[] =        _("Encounter Modifier…{CLEAR_T
 static const u8 sDebugText_EncounterScreen[] =  _("ENCOUNTER {STR_VAR_1}\n{STR_VAR_2}\nNo. {STR_VAR_3}\n\nUP/DOWN: Choose\nL/R: Jump 10\nA: Toggle  B: Back");
 static const u8 sDebugText_WalkThroughWalls[] = _("Walk Through Walls");
 static const u8 sDebugText_InfiniteRepel[] = _("Infinite Repel");
+static const u8 sDebugText_InfinitePP[] = _("Infinite PP");
+static const u8 sDebugText_AlwaysCatch[] = _("100% Catch Rate");
 static const u8 sDebugText_ToggleScreen[] = _("{STR_VAR_1}\n\nStatus: {STR_VAR_2}\n\nA: Toggle  B: Back");
 static const u8 sDebugText_Utilities[] =        _("Utilities…{CLEAR_TO 110}{RIGHT_ARROW}");
 static const u8 sDebugText_Scripts[] =          _("Scripts…{CLEAR_TO 110}{RIGHT_ARROW}");
@@ -658,6 +664,8 @@ static const struct ListMenuItem sDebugMenu_Items_Main[] =
     {sDebugText_Encounter,         DEBUG_MENU_ITEM_ENCOUNTER},
     {sDebugText_WalkThroughWalls,  DEBUG_MENU_ITEM_WALK_THROUGH_WALLS},
     {sDebugText_InfiniteRepel,     DEBUG_MENU_ITEM_INFINITE_REPEL},
+    {sDebugText_InfinitePP,        DEBUG_MENU_ITEM_INFINITE_PP},
+    {sDebugText_AlwaysCatch,       DEBUG_MENU_ITEM_ALWAYS_CATCH},
     {sDebugText_Utilities,         DEBUG_MENU_ITEM_UTILITIES},
     {sDebugText_Give,              DEBUG_MENU_ITEM_GIVE},
     {sDebugText_PkmCreator,        DEBUG_MENU_ITEM_POKEMON_CREATOR},
@@ -806,6 +814,8 @@ static void (*const sDebugMenu_Actions_Main[])(u8) =
     [DEBUG_MENU_ITEM_ACCESS_PC]       = DebugAction_AccessPC,
     [DEBUG_MENU_ITEM_WALK_THROUGH_WALLS] = DebugAction_OpenWalkThroughWallsMenu,
     [DEBUG_MENU_ITEM_INFINITE_REPEL]  = DebugAction_OpenInfiniteRepelMenu,
+    [DEBUG_MENU_ITEM_INFINITE_PP]     = DebugAction_OpenInfinitePPMenu,
+    [DEBUG_MENU_ITEM_ALWAYS_CATCH]    = DebugAction_OpenAlwaysCatchMenu,
     [DEBUG_MENU_ITEM_CANCEL]          = DebugAction_Cancel
 };
 static void (*const sDebugMenu_Actions_Utilities[])(u8) =
@@ -1798,10 +1808,20 @@ static void Debug_DrawToggleMenu(u8 taskId)
         StringCopy(gStringVar1, sDebugText_WalkThroughWalls);
         enabled = FlagGet(FLAG_SYS_NO_COLLISION);
     }
-    else
+    else if (gTasks[taskId].data[3] == 1)
     {
         StringCopy(gStringVar1, sDebugText_InfiniteRepel);
         enabled = FlagGet(FLAG_SYS_NO_ENCOUNTER);
+    }
+    else if (gTasks[taskId].data[3] == 2)
+    {
+        StringCopy(gStringVar1, sDebugText_InfinitePP);
+        enabled = VarGet(VAR_CHEAT_INFINITE_PP) != 0;
+    }
+    else
+    {
+        StringCopy(gStringVar1, sDebugText_AlwaysCatch);
+        enabled = VarGet(VAR_CHEAT_ALWAYS_CATCH) != 0;
     }
 
     StringCopy(gStringVar2, enabled ? sDebugText_True : sDebugText_False);
@@ -1840,14 +1860,28 @@ static void DebugAction_OpenInfiniteRepelMenu(u8 taskId)
     DebugAction_OpenToggleMenu(taskId, 1);
 }
 
+static void DebugAction_OpenInfinitePPMenu(u8 taskId)
+{
+    DebugAction_OpenToggleMenu(taskId, 2);
+}
+
+static void DebugAction_OpenAlwaysCatchMenu(u8 taskId)
+{
+    DebugAction_OpenToggleMenu(taskId, 3);
+}
+
 static void DebugTask_HandleToggleMenu(u8 taskId)
 {
     if (gMain.newKeys & A_BUTTON)
     {
         if (gTasks[taskId].data[3] == 0)
             FlagToggle(FLAG_SYS_NO_COLLISION);
-        else
+        else if (gTasks[taskId].data[3] == 1)
             FlagToggle(FLAG_SYS_NO_ENCOUNTER);
+        else if (gTasks[taskId].data[3] == 2)
+            VarSet(VAR_CHEAT_INFINITE_PP, VarGet(VAR_CHEAT_INFINITE_PP) == 0);
+        else
+            VarSet(VAR_CHEAT_ALWAYS_CATCH, VarGet(VAR_CHEAT_ALWAYS_CATCH) == 0);
 
         PlaySE(SE_SELECT);
         Debug_DrawToggleMenu(taskId);

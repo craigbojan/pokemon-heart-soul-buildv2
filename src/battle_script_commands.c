@@ -1275,7 +1275,9 @@ static void Cmd_ppreduce(void)
         }
     }
 
-    if (!(gHitMarker & (HITMARKER_NO_PPDEDUCT | HITMARKER_NO_ATTACKSTRING)) && gBattleMons[gBattlerAttacker].pp[gCurrMovePos])
+    if (!(gHitMarker & (HITMARKER_NO_PPDEDUCT | HITMARKER_NO_ATTACKSTRING))
+     && gBattleMons[gBattlerAttacker].pp[gCurrMovePos]
+     && !(VarGet(VAR_CHEAT_INFINITE_PP) && GetBattlerSide(gBattlerAttacker) == B_SIDE_PLAYER))
     {
         gProtectStructs[gBattlerAttacker].notFirstStrike = 1;
 
@@ -3571,7 +3573,8 @@ static void Cmd_tryfaintmon(void)
             {
                 u8 moveIndex = *(gBattleStruct->chosenMovePositions + gBattlerAttacker);
 
-                gBattleMons[gBattlerAttacker].pp[moveIndex] = 0;
+                if (!(VarGet(VAR_CHEAT_INFINITE_PP) && GetBattlerSide(gBattlerAttacker) == B_SIDE_PLAYER))
+                    gBattleMons[gBattlerAttacker].pp[moveIndex] = 0;
                 BattleScriptPush(gBattlescriptCurrInstr);
                 gBattlescriptCurrInstr = BattleScript_GrudgeTakesPp;
                 gActiveBattler = gBattlerAttacker;
@@ -9156,7 +9159,9 @@ static void Cmd_tryspiteppreduce(void)
                 break;
         }
 
-        if (i != MAX_MON_MOVES && gBattleMons[gBattlerTarget].pp[i] > 1)
+        if (i != MAX_MON_MOVES
+         && gBattleMons[gBattlerTarget].pp[i] > 1
+         && !(VarGet(VAR_CHEAT_INFINITE_PP) && GetBattlerSide(gBattlerTarget) == B_SIDE_PLAYER))
         {
             s32 ppToDeduct = (Random() & 3) + 2;
             if (gBattleMons[gBattlerTarget].pp[i] < ppToDeduct)
@@ -10907,6 +10912,9 @@ static void Cmd_handleballthrow(void)
                     gBattleResults.catchAttempts[gLastUsedItem - ITEM_ULTRA_BALL]++;
             }
         }
+
+        if (VarGet(VAR_CHEAT_ALWAYS_CATCH) != 0)
+            odds = 255;
 
         if (odds > 254) // mon caught
         {

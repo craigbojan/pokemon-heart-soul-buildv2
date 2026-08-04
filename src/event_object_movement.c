@@ -6370,7 +6370,14 @@ static u8 GetVanillaCollision(struct ObjectEvent *objectEvent, s16 x, s16 y, u8 
 
 #if TX_DEBUG_SYSTEM_ENABLE == TRUE
     if (FlagGet(FLAG_SYS_NO_COLLISION))
+    {
+        // Ignore map and terrain collision, but keep NPC/object collision.
+        // This preserves trainer sight/approach sequences and prevents
+        // walking through characters while the cheat is enabled.
+        if (DoesObjectCollideWithObjectAt(objectEvent, x, y))
+            return COLLISION_OBJECT_EVENT;
         return COLLISION_NONE;
+    }
 #endif
 
     if (IsCoordOutsideObjectEventMovementRange(objectEvent, x, y))
