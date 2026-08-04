@@ -173,10 +173,14 @@
 #define VAR_LILYCOVE_CONTEST_LOBBY_STATE                 0x4099 //Not used in HnS but may be later
 #define VAR_ROUTE22_GIOVANNI_STATE                       0x409A
 #define VAR_ROUTE27_BAOBA_CALL                              0x409B 
-#define VAR_CHEAT_ENCOUNTER_ENABLED                      0x409C
-#define VAR_CHEAT_ENCOUNTER_SPECIES                      0x409D
-#define VAR_CHEAT_INFINITE_PP                            0x409E
-#define VAR_CHEAT_ALWAYS_CATCH                           0x409F // HnS Vars end
+#define VAR_UNUSED_HNS_VAR4                              0x409C
+#define VAR_UNUSED_HNS_VAR5                              0x409D
+#define VAR_UNUSED_HNS_VAR6                              0x409E
+#define VAR_UNUSED_HNS_VAR7                              0x409F // HnS Vars end
+#define VAR_CHEAT_ENCOUNTER_ENABLED                      VAR_UNUSED_HNS_VAR4
+#define VAR_CHEAT_ENCOUNTER_SPECIES                      VAR_UNUSED_HNS_VAR5
+#define VAR_CHEAT_INFINITE_PP                            VAR_UNUSED_HNS_VAR6
+#define VAR_CHEAT_ALWAYS_CATCH                           VAR_UNUSED_HNS_VAR7
 #define VAR_SLATEPORT_HARBOR_STATE                       0x40A0
 #define VAR_UNUSED_0x40A1                                0x40A1 
 #define VAR_SEAFLOOR_CAVERN_STATE                        0x40A2
@@ -323,11 +327,5 @@
 #define VAR_TEMP_FRONTIER_TUTOR_ID         VAR_TEMP_E
 
 #define VAR_TEMP_TRANSFERRED_SPECIES  VAR_TEMP_1
-
-#define VAR_UNUSED_HNS_VAR4 0x409C
-#define VAR_UNUSED_HNS_VAR5 0x409D
-
-#define VAR_CHEAT_ENCOUNTER_ENABLED VAR_UNUSED_HNS_VAR4
-#define VAR_CHEAT_ENCOUNTER_SPECIES VAR_UNUSED_HNS_VAR5
 
 #endif // GUARD_CONSTANTS_VARS_H
